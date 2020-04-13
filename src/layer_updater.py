@@ -9,13 +9,13 @@
 #
 '''
 
-# pylint: disable=C0116,C0301,W0511,W1202,R0912,R0914,R0915
+# pylint: disable=C0116,C0301,C0411,W0511,W1202,R0912,R0914,R0915
 
 import time
 
 from crimsoncore import LambdaCore
 
-from aws_xray_sdk.core import patch_all # pylint: disable=C0411
+from aws_xray_sdk.core import patch_all
 patch_all()
 
 LAMBDA_NAME = 'layer_updater'
