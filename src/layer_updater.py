@@ -11,8 +11,6 @@
 
 # pylint: disable=C0116,C0301,C0411,W0511,W1202,R0912,R0914,R0915
 
-import time
-
 from crimsoncore import LambdaCore
 
 from aws_xray_sdk.core import patch_all
@@ -38,10 +36,6 @@ def get_layer_version_from_arn(arn):
     return parse_lambda_layer_arn(arn).get('version')
 
 def lambda_handler(event, context):
-    start_time = str(int(time.time() * 1000))
-    log_name = f'{LAMBDA_NAME}_{start_time}.log'
-    LAMBDA.change_logfile(log_name)
-
     try:
         layer_name = event.get('layer_name', False)
         if not layer_name:
@@ -114,14 +108,6 @@ def lambda_handler(event, context):
         LAMBDA.logger.info('Run completed')
     except Exception:
         LAMBDA.logger.error('Fatal error during script runtime', exc_info=True)
-
-        # do our best to fire off the emergency flare
-        error_log_dest = f'logs/{LAMBDA_NAME}/{log_name}'
-        with open(f'{LAMBDA.config.get_log_path()}/{log_name}', 'r') as file:
-            LAMBDA.archive_log_file(error_log_dest, file.read())
-
-        LAMBDA.send_notification('error', f'λ! - {LAMBDA_NAME} lambda error notification - error logs are available at {error_log_dest}')
+        LAMBDA.send_notification('error', f'{LAMBDA_NAME} lambda error notification; reference logstream {LAMBDA.config.get_log_stream()}')
 
         raise
-    finally:
-        LAMBDA.change_logfile(f'{LAMBDA_NAME}_interim.log')
