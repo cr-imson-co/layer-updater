@@ -106,8 +106,8 @@ def lambda_handler(event, context):
                 )
 
         LAMBDA.logger.info('Run completed')
-    except Exception:
-        LAMBDA.logger.error('Fatal error during script runtime', exc_info=True)
+    except Exception as ex:
+        LAMBDA.logger.error('Fatal error during script runtime', exc_info=ex)
         LAMBDA.send_notification('error', f'{LAMBDA_NAME} lambda error notification; reference logstream {LAMBDA.config.get_log_stream()}')
 
         raise
